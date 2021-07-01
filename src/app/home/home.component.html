@@ -1,7 +1,32 @@
-<h1>{{ title }}</h1>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <!-- this creates a google map on the page with the given lat/lng from -->
+      <!-- the component as the initial center of the map: -->
+      <!-- <agm-map [latitude]="lat" [longitude]="lng">
+        <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+      </agm-map> -->
 
-<!-- this creates a google map on the page with the given lat/lng from -->
-<!-- the component as the initial center of the map: -->
-<agm-map [latitude]="lat" [longitude]="lng">
-  <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-</agm-map>
+      <h4>{{ title }}</h4>
+      <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [disableDefaultUI]="false"
+        (mapClick)="mapClicked($event)">
+        <agm-marker *ngFor="let m of markers; let i = index" (markerClick)="clickedMarker(m.label, i)"
+          [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable" [label]="m.label"
+          (dragEnd)="markerDragEnd(m, $event)">
+          <agm-info-window>
+            <strong>InfoWindow content</strong>
+          </agm-info-window>
+        </agm-marker>
+        <agm-circle [latitude]="lat + 0.3" [longitude]="lng" [radius]="5000" [fillColor]="'red'"
+          [circleDraggable]="true" [editable]="true">
+        </agm-circle>
+      </agm-map>
+    </div>
+    <div class="col-sm">
+      One of three columns
+    </div>
+    <div class="col-sm">
+      One of three columns
+    </div>
+  </div>
+</div>
