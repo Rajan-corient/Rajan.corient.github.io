@@ -13,6 +13,8 @@ import { AgmCoreModule } from '@agm/core';
     CommonModule,
     HomeRoutingModule,
     AgmCoreModule.forRoot({
+      // google mapi API key:
+      // https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
       apiKey: 'AIzaSyDjd85ThShiW3uZ8yKTJ-ipoJ_V97pxx8c'
     })
   ]
