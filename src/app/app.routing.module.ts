@@ -5,18 +5,27 @@ import { ContactUsComponent } from './contact-us/contact-us.component';
 import { HomeComponent } from './home/home.component';
 
 const routes: Routes = [
-
-  { path: '', redirectTo: 'home', 
-    pathMatch: 'full' 
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
   },
-  { path: 'home',
+  {
+    path: 'home',
     loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
-  },  
-  { path: 'about',
+  },
+  {
+    path: 'about',
     loadChildren: () => import('./about/about.module').then(m => m.AboutModule)
-  },  
-  { path: 'contact-us',
+  },
+  {
+    path: 'contact-us',
     loadChildren: () => import('./contact-us/contact-us.module').then(m => m.ContactUsModule)
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
+    pathMatch: 'full'
   }
 
   // { path: '', redirectTo: 'home', pathMatch: 'full' },
