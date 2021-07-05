@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { HomeRoutingModule } from './home.routing.module';
 import { AgmCoreModule } from '@agm/core';
+import { HighchartsChartModule } from 'highcharts-angular';
 
 
 @NgModule({
@@ -12,6 +13,7 @@ import { AgmCoreModule } from '@agm/core';
   imports: [
     CommonModule,
     HomeRoutingModule,
+    HighchartsChartModule,
     AgmCoreModule.forRoot({
       // google mapi API key:
       // https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
