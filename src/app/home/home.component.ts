@@ -1,15 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { DataServiceService } from '../service/data-service.service';
 import * as Highcharts from 'highcharts';
-import { MapsAPILoader } from '@agm/core';
 
-// just an interface for type safety.
-interface marker {
+interface Imarker {
 	lat: number;
 	lng: number;
 	label?: any;
 	draggable: boolean;
 }
+
+interface IchartData {
+  series: Iseries[],
+  categories: (string | number)[]
+}
+
+interface Iseries {
+  name: string,  
+  data: Idata[],  
+}
+
+interface Idata {
+  name: string,  
+  y: number | string,
+  rocket_name?: string,
+  rocket_id?: string,
+}
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -19,7 +35,7 @@ interface marker {
 export class HomeComponent implements OnInit {
 
   // AGM variables
-  title = 'All Launchpads';
+  title = 'Launchpad location';
   lat:number = 51.678418;
   lng:number = 7.809007;
   zoom: number = 1;
@@ -27,11 +43,15 @@ export class HomeComponent implements OnInit {
   launchpadList:any[] = [];
   launchesList:any[] = [];
 
-  markers: marker[] = [];
+  upcomingCount:number = 0;
+  pastCount:number = 0;
+
+  markers: Imarker[] = [];
 
   // Highchar variables
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions:any;
+  chartUpdateFlag:boolean = false;
 
   constructor(
     private dataService: DataServiceService) { }
@@ -39,14 +59,15 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.getLaunchPadData();
     this.getLaunchesData();
+    this.setChartOption();
   }
 
   getLaunchPadData () {
     this.dataService.getLaunchPadData().subscribe(res => {
-      console.log('launchpad data', res)
+      console.log('launchpadList', res)
       this.launchpadList = res;
       for (const launchItem of this.launchpadList) {
-        const obj =  {
+        const obj = {
           lat: launchItem.location.latitude,
           lng: launchItem.location.longitude,
           label: launchItem.location.name,
@@ -59,9 +80,31 @@ export class HomeComponent implements OnInit {
 
   getLaunchesData () {
     this.dataService.getLaunchesData().subscribe(res => {
-      console.log('launches data', res)
-      this.launchesList = res.data;
-      this.setChartOption();
+      console.log('launchesList', res)
+      this.launchesList = res;
+
+      this.upcomingCount = this.launchesList.filter(item => item.upcoming).length;
+      this.pastCount = this.launchesList.filter(item => !item.upcoming).length;
+
+      const chartData:IchartData = {
+        series: [{
+          name: 'All Launches',
+          data: []
+        }],
+        categories: []
+      }
+      for (const launchData of this.launchesList) {
+        const obj = {
+          name: launchData.mission_name,
+          y: launchData.flight_number,
+          rocketName: launchData.rocket.rocket_name
+        }
+        chartData.series[0].data.push(obj);
+        chartData.categories.push(launchData.launch_year);
+      }
+      this.chartOptions.series = chartData.series;
+      this.chartOptions.xAxis.categories = chartData.categories;
+      this.chartUpdateFlag = true;
     })
   }
 
@@ -71,32 +114,29 @@ export class HomeComponent implements OnInit {
         type: 'column'
       },
       title: {
-        text: 'Column chart'
+        text: 'Launche over time'
       },
       credits: {
         enabled: false
       },
       legend: {
-        enabled: true
+        enabled: false
       },
       xAxis: {
         title: {
-          text: 'test'
+          text: 'Year'
         },
-        categories: ['2010', '2011', '2012', '2013', '2014', '2015']
+        categories: []
+      },
+      yAxis: {
+        title: {
+          text: 'Count'
+        }
       },
       series: [
         {
           name: 'Line 1',
-          data: [1, 2, 3, 4, 5, 6]
-        },
-        {
-          name: 'Line 2',
-          data: [6, 5, 4, 3, 2, 1]
-        },
-        {
-          name: 'Line 3',
-          data: [1, 2, 3, 4, 5, 6]
+          data: []
         }
       ]
     };  
@@ -114,7 +154,7 @@ export class HomeComponent implements OnInit {
     });
   }
   
-  markerDragEnd(m: marker, $event: any) {
+  markerDragEnd(m: Imarker, $event: any) {
     console.log('dragEnd', m, $event);
   }
 
