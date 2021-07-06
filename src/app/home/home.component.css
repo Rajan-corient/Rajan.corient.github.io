@@ -1,6 +1,6 @@
 @media (min-width:992px) {
     .page-container {
-        height: 500px !important;
+        height: 400px !important;
         overflow-y: auto;
     }
 
