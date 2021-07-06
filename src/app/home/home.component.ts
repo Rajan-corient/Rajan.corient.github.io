@@ -45,6 +45,7 @@ export class HomeComponent implements OnInit {
 
   upcomingCount:number = 0;
   pastCount:number = 0;
+  currentIndex:number = 0;
 
   markers: Imarker[] = [];
 

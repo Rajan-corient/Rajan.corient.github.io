@@ -69,12 +69,12 @@
                 <div class="col-lg-6">
                     <p>Basic Timeline</p>
                     <div class="timeline p-4 block mb-4">
-                      <div class="tl-item" [ngClass]="{'active': i==0}" *ngFor="let launchItem of launchesList; index as i
+                      <div class="tl-item" [ngClass]="{'active': i == currentIndex}" *ngFor="let launchItem of launchesList; index as i
                       even as even; odd as odd">
                           <div class="tl-dot b-warning" [ngClass]="{'b-primary': even, 'b-warning': odd}"></div>
                           <div class="tl-content">
-                              <div class="font-weight-bold">
-                                {{ launchItem.mission_name | titlecase }}
+                              <div class="font-weight-bold" style="cursor: pointer;" (click)="currentIndex = i">
+                                <span>{{ launchItem.mission_name | titlecase }}</span>
                               </div>
                               <div class="tl-date text-muted mt-1">
                                 <span class="">{{ launchItem.launch_date_utc | date: 'longDate'}}</span>
