@@ -94,14 +94,41 @@ export class HomeComponent implements OnInit {
         }],
         categories: []
       }
+
+      chartData.categories = [...new Set(this.launchesList.map(item => item.launch_year))];
+      let launchObj:any = {};
+
+      // with forloop inside other forloop
+      // for (const item of chartData.categories) {
+      //   launchObj[item] = [];
+      //   for (const launchData of this.launchesList) {
+      //     if (launchData.launch_year === item) {
+      //       launchObj[item].push(launchData);
+      //     }
+      //   }
+      //   const obj = {
+      //     name: '',
+      //     y: launchObj[item].length
+      //   }
+      //   chartData.series[0].data.push(obj);
+      // }
+
+
+      // with two separate forloops
       for (const launchData of this.launchesList) {
+        if (!(launchData.launch_year in launchObj)) {
+          launchObj[launchData.launch_year] = [];
+        }
+        launchObj[launchData.launch_year].push(launchData);
+      }
+
+      for (const key in launchObj) {
+        const element = launchObj[key];
         const obj = {
-          name: launchData.mission_name,
-          y: launchData.flight_number,
-          rocketName: launchData.rocket.rocket_name
+          name: '',
+          y: element.length
         }
         chartData.series[0].data.push(obj);
-        chartData.categories.push(launchData.launch_year);
       }
       this.chartOptions.series = chartData.series;
       this.chartOptions.xAxis.categories = chartData.categories;
