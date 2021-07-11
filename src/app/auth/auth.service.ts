@@ -16,8 +16,12 @@ export class AuthService {
     return this.loggedIn.asObservable();
   }
 
-  get userList():any {
+  get userList():IRegister[] {
     return JSON.parse(localStorage.getItem('userList') || '{}');
+  }
+
+  get loggedInUser():IRegister {
+    return JSON.parse(localStorage.getItem('loggedInUser') || '{}');
   }
 
   constructor(
@@ -25,8 +29,9 @@ export class AuthService {
   ) { }
 
   login(user: IUser) {
-    if (user.userName !== '' && user.password !== '') {
-      const users = this.userList;
+    let currentUser:any = this.userList.find(item => item.userId == user.userId && item.password == user.password);
+    if (currentUser.userId && currentUser.password) {
+      localStorage.setItem('loggedInUser', JSON.stringify(currentUser))
       this.loggedIn.next(true);
       this.router.navigate(['/']);
     }

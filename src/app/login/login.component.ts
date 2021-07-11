@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
-      userName: ['', Validators.required],
+      userId: ['', Validators.required],
       password: ['', Validators.required]
     });
     this.formSubmitAttempt = false;
@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit {
   //   );
   // }
 
-  onSubmit() {
+  login() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value);
     }

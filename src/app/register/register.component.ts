@@ -10,6 +10,7 @@ import { AuthService } from '../auth/auth.service';
 export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
+  userList:any = [];
 
   constructor(
     private fb: FormBuilder,
@@ -18,8 +19,9 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
+      userId: ['', Validators.required],
       email: ['', Validators.required],
-      password: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
@@ -34,10 +36,12 @@ export class RegisterComponent implements OnInit {
   //   );
   // }
 
-  onSubmit() {
+  onRegister() {
     if (this.registerForm.valid) {
       let userObj = this.registerForm.getRawValue();
-      localStorage.setItem('userList', JSON.stringify(userObj));
+      this.userList.push(userObj)
+      localStorage.setItem('userList', JSON.stringify(this.userList));
+      this.registerForm.reset();
     }
   }
 
