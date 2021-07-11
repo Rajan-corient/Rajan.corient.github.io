@@ -30,7 +30,7 @@ export class AuthService {
 
   login(user: IUser) {
     let currentUser:any = this.userList.find(item => item.userId == user.userId && item.password == user.password);
-    if (currentUser.userId && currentUser.password) {
+    if (currentUser && currentUser.userId && currentUser.password) {
       localStorage.setItem('loggedInUser', JSON.stringify(currentUser))
       this.loggedIn.next(true);
       this.router.navigate(['/']);
