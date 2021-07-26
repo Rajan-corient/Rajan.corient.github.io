@@ -1,1 +1,52 @@
-<p>about works!</p>
+<div class="container-fluid">
+    <div class="row">
+      <div class="com-sm">
+        <h2 class="ml-3">Postal Data</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <input class="form-control" type="text" name="searchTerm" [formControl]="searchTerm">
+      </div>
+    </div>  
+    <div class="row">
+      <div class="col-sm">
+        <table id="city">
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th>Pincode</th>
+              <th>District</th>
+              <th>State</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of postalCodeList">
+              <td>{{item.location}}</td>
+              <td>{{item.pincode}}</td>
+              <td>{{item.district}}</td>
+              <td>{{item.state}}</td>
+            </tr>
+          </tbody>
+        </table>        
+      </div>
+      <div class="col-sm">
+        <h4>{{ title }}</h4>
+        <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [disableDefaultUI]="false"
+          (mapClick)="mapClicked($event)" style="height: 300px;">
+          <agm-marker *ngFor="let m of markers; let i = index" (markerClick)="clickedMarker(m.label, i)"
+            [latitude]="m.lat" [longitude]="m.lng" [markerDraggable]="m.draggable" [label]="m.label"
+            (dragEnd)="markerDragEnd(m, $event)">
+            <agm-info-window>
+              <strong>InfoWindow content</strong>
+            </agm-info-window>
+          </agm-marker>
+          <agm-circle [latitude]="lat + 0.3" [longitude]="lng" [radius]="5000" [fillColor]="'red'"
+            [circleDraggable]="true" [editable]="false">
+          </agm-circle>
+        </agm-map>
+      </div>
+    </div>
+    <div class="row">
+    </div>
+  </div>

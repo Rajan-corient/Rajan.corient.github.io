@@ -1,0 +1,22 @@
+
+#city {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#city td,th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#city tr:hover {background-color: #ddd;}
+
+#city th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #8fb1f1;
+  color: white;
+}
+  
