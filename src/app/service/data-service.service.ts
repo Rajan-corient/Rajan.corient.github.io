@@ -24,6 +24,12 @@ export class DataServiceService {
       return this.http.get<any>('https://run.mocky.io/v3/3c48b757-7977-421f-ac01-2d0ab6bcfcd7')
     }
 
+    getLocation(): Observable<any> {
+      // httpHeader.set('X-Parse-Application-Id', 'G7Z8d2KcYmU0WsiPgFIZS43FUBLvarKdx5MtgyLs')
+      // .set('X-Parse-Master-Key', 'TRxCvj4TyIJFd2NBs5XyXeQxAqUpm7SageFJ2sUZ');
+      return this.http.get<any>('https://www.mapmyindia.com/api/advanced-maps/doc/sample/getrespgeocode.php?address=400096&itemCount=1&bias=0&pod=&bound=')
+    }
+
 
     // mock data
     // [

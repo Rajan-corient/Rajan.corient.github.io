@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, NgZone, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MapsAPILoader, AgmMap, GoogleMapsAPIWrapper } from '@agm/core';
 import { DataServiceService } from '../service/data-service.service';
+
+declare var google: any;
 
 interface Imarker {
 	lat: number;
@@ -8,12 +11,41 @@ interface Imarker {
 	label?: any;
 	draggable: boolean;
 }
+
+interface ILocation {
+  lat: number;
+  lng: number;
+  viewport?: Object;
+  zoom: number;
+  address_level_1?:string;
+  address_level_2?: string;
+  address_country?: string;
+  address_zip?: string;
+  address_state?: string;
+  marker?: Imarker;
+}
+
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent implements OnInit {
+
+  @ViewChild(AgmMap) map: AgmMap;
+
+  geocoder:any;
+  public location:any = {
+    lat: 51.678418,
+    lng: 7.809007,
+    marker: {
+      lat: 51.678418,
+      lng: 7.809007,
+      draggable: true
+    },
+    zoom: 5
+  };
+  circleRadius:number = 5000;
 
   // AGM variables
   title = 'Map location by postal code';
@@ -28,10 +60,22 @@ export class AboutComponent implements OnInit {
   searchTerm:FormControl;
 
   constructor(
-    private dataService: DataServiceService) { }
+    public mapsApiLoader: MapsAPILoader,
+    private zone: NgZone,
+    private wrapper: GoogleMapsAPIWrapper,
+    private dataService: DataServiceService) { 
+      this.mapsApiLoader = mapsApiLoader;
+      this.zone = zone;
+      this.wrapper = wrapper;
+      this.mapsApiLoader.load().then(() => {
+        this.geocoder = new google.maps.Geocoder();
+      });
+    }
 
   ngOnInit(): void {
+    this.location.marker.draggable = true;
     this.getMockerData();
+    // this.getLocation();
     this.searchTerm = new FormControl('');
 
     this.searchTerm.valueChanges.subscribe(data => {
@@ -59,7 +103,13 @@ export class AboutComponent implements OnInit {
         // this.markers.push(obj);
       }
     })
-  }  
+  }
+
+  getLocation () {
+    this.dataService.getLocation().subscribe(res => {
+      console.log('testData', res)
+    })
+  }
 
   // getMockerData () {
   //   this.dataService.getMockerData().subscribe(res => {
@@ -80,9 +130,96 @@ export class AboutComponent implements OnInit {
     });
   }
   
-  markerDragEnd(m: Imarker, $event: any) {
-    console.log('dragEnd', m, $event);
+  markerDragEnd($event: any, m?: any) {
+    this.location.marker.lat = m.coords.lat;
+    this.location.marker.lng = m.coords.lng;
+    this.findAddressByCoordinates();
+   }
+
+   findAddressByCoordinates() {
+    this.geocoder.geocode({
+      'location': {
+        lat: this.location.marker.lat,
+        lng: this.location.marker.lng
+      }
+    },(results: any, status: any) => {
+      this.decomposeAddressComponents(results);
+    })
   }
 
+  decomposeAddressComponents(addressArray:any) {
+    if (addressArray.length == 0) return false;
+    let address = addressArray[0].address_components;
+
+    for(let element of address) {
+      if (element.length == 0 && !element['types']) continue
+
+      if (element['types'].indexOf('street_number') > -1) {
+        this.location.address_level_1 = element['long_name'];
+        continue;
+      }
+      if (element['types'].indexOf('route') > -1) {
+        this.location.address_level_1 += ', ' + element['long_name'];
+        continue;
+      }
+      if (element['types'].indexOf('locality') > -1) {
+        this.location.address_level_2 = element['long_name'];
+        continue;
+      }
+      if (element['types'].indexOf('administrative_area_level_1') > -1) {
+        this.location.address_state = element['long_name'];
+        continue;
+      }
+      if (element['types'].indexOf('country') > -1) {
+        this.location.address_country = element['long_name'];
+        continue;
+      }
+      if (element['types'].indexOf('postal_code') > -1) {
+        this.location.address_zip = element['long_name'];
+        continue;
+      }
+    }
+    return true;
+  }
+
+  updateOnMap() {
+    let address:string = this.searchTerm.value;
+    this.findLocation(address);
+  }
+
+  findLocation(address: string) {
+    if (!this.geocoder) this.geocoder = new google.maps.Geocoder()
+    this.geocoder.geocode({
+      'address': address
+    }, (results: any, status: any) => {
+      console.log(results);
+      if (status == google.maps.GeocoderStatus.OK) {
+        console.log(results)
+        // resultsMap.setCenter(results[0].geometry.location);
+        // new google.maps.Marker({
+        //   map: resultsMap,
+        //   position: results[0].geometry.location,
+        // });
+      } else {
+        console.log("Sorry, this search produced no results.");
+      }
+    })
+  }
+
+  circleRadiusInKm() {
+    return this.circleRadius / 1000;
+  }
+
+  milesToRadius(value: any) {
+     this.circleRadius = value / 0.00062137;
+  }
+
+  circleRadiusInMiles() {
+    return this.circleRadius * 0.00062137;
+  }
+  
 
 }
+
+
+
