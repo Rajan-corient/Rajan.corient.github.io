@@ -1,7 +1,13 @@
+@agm/core
+MIT
+
 @angular/common
 MIT
 
 @angular/core
+MIT
+
+@angular/forms
 MIT
 
 @angular/material
