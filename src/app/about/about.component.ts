@@ -2,6 +2,7 @@ import { Component, Input, ViewChild, NgZone, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MapsAPILoader, AgmMap, GoogleMapsAPIWrapper } from '@agm/core';
 import { DataServiceService } from '../service/data-service.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 declare var google: any;
 
@@ -78,14 +79,19 @@ export class AboutComponent implements OnInit {
     // this.getLocation();
     this.searchTerm = new FormControl('');
 
-    this.searchTerm.valueChanges.subscribe(data => {
-      console.log(data)
-      this.postalCodeList = this.copyOfPostalCodeList.filter(item => item.pincode.indexOf(data) != -1);
-
-      if (data == '') {
-        this.postalCodeList = this.copyOfPostalCodeList;
-      }
+    this.searchTerm.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+    ).subscribe(data => {
+        console.log(data)
+        this.postalCodeList = this.copyOfPostalCodeList.filter(item => item.pincode.indexOf(data) != -1);
+        this.updateOnMap(data);
+  
+        if (data == '') {
+          this.postalCodeList = this.copyOfPostalCodeList;
+        }
     })
+
   }
 
   getMockerData () {
@@ -182,12 +188,14 @@ export class AboutComponent implements OnInit {
     return true;
   }
 
-  updateOnMap() {
-    let address:string = this.searchTerm.value;
+  updateOnMap(address: any) {
     this.findLocation(address);
   }
 
-  findLocation(address: string) {
+
+  // Not getting location data shows below  error to enable billing
+  // js?v=quarterly&callback=agmLazyMapsAPILoader&key=AIzaSyDjd85ThShiW3uZ8yKTJ-ipoJ_V97pxx8c:82 Geocoding Service: You must enable Billing on the Google Cloud Project at https://console.cloud.google.com/project/_/billing/enable Learn more at https://developers.google.com/maps/gmp-get-started
+  findLocation(address: any) {
     if (!this.geocoder) this.geocoder = new google.maps.Geocoder()
     this.geocoder.geocode({
       'address': address
